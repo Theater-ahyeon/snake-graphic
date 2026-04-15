@@ -47,6 +47,12 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  transform: none !important;
+}
+
 .experience {
   position: relative;
   min-height: 100vh;
@@ -303,6 +309,74 @@ button {
   display: grid;
   gap: 8px;
   margin-top: 10px;
+}
+
+.desktop-suite__card {
+  display: grid;
+  gap: 14px;
+  margin-top: 12px;
+  padding: 16px;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at top right, rgba(69, 240, 223, 0.12), transparent 38%),
+    linear-gradient(180deg, rgba(13, 25, 41, 0.88), rgba(9, 19, 32, 0.78));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.desktop-suite__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.desktop-suite__head strong,
+.desktop-suite__head span {
+  display: block;
+}
+
+.desktop-suite__head strong {
+  font-size: 1rem;
+}
+
+.desktop-suite__head span {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.desktop-suite__actions {
+  display: grid;
+  gap: 10px;
+}
+
+.desktop-suite__actions .ghost-button {
+  width: 100%;
+  text-align: left;
+}
+
+.desktop-badge {
+  min-width: 88px;
+}
+
+.desktop-status {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  color: #c9deea;
+  line-height: 1.6;
+  background: rgba(8, 20, 35, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.desktop-status[data-tone="success"] {
+  border-color: rgba(69, 240, 223, 0.28);
+  background: rgba(8, 31, 36, 0.62);
+}
+
+.desktop-status[data-tone="error"] {
+  border-color: rgba(255, 107, 107, 0.28);
+  background: rgba(44, 16, 19, 0.62);
 }
 
 .toggle-group {

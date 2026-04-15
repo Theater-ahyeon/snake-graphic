@@ -9,6 +9,14 @@ import type {
   ReplayRun,
   SnakeSnapshot
 } from "../game/simulation/types";
+import {
+  exportDesktopSave,
+  getDesktopMeta,
+  importDesktopSave,
+  isDesktopEnvironment,
+  openDesktopDataDirectory,
+  type DesktopMeta
+} from "../platform/desktop";
 import { GameScene, type ScenePreferences } from "../phaser/scenes/GameScene";
 
 const SETTINGS_KEY = "neon-snake-ui-settings-v2";
@@ -28,6 +36,16 @@ interface ReplayPlaybackState {
   frameIndex: number;
   playing: boolean;
   timerId: number | null;
+}
+
+type DesktopMessageTone = "neutral" | "success" | "error";
+
+interface DesktopToolState {
+  available: boolean;
+  busy: boolean;
+  meta: DesktopMeta | null;
+  message: string;
+  tone: DesktopMessageTone;
 }
 
 function readStoredSettings(): StoredSettings {
@@ -135,6 +153,11 @@ function routeTitle(route: GameRoute): string {
   return route === "campaign" ? "竞技征程" : "自由练习";
 }
 
+function desktopRuntimeLabel(meta: DesktopMeta | null): string {
+  if (!meta) return "Browser Sandbox";
+  return `${meta.platform} / v${meta.version}`;
+}
+
 export function createSnakeExperience(root: HTMLElement): void {
   const params = new URLSearchParams(window.location.search);
   const storedSettings = readStoredSettings();
@@ -149,6 +172,15 @@ export function createSnakeExperience(root: HTMLElement): void {
     frameIndex: 0,
     playing: false,
     timerId: null
+  };
+  const desktopState: DesktopToolState = {
+    available: isDesktopEnvironment(),
+    busy: false,
+    meta: getDesktopMeta(),
+    message: isDesktopEnvironment()
+      ? "Desktop shell ready. Saves can be exported, imported, and inspected locally."
+      : "Web mode active. Package with Electron to unlock desktop save tools.",
+    tone: "neutral"
   };
 
   const initialRoute = params.get("route") === "sandbox" ? "sandbox" : storedSettings.route;
@@ -359,6 +391,31 @@ export function createSnakeExperience(root: HTMLElement): void {
     </div>
   `;
 
+  const intelPaneMount = root.querySelector(".intel-pane");
+  intelPaneMount?.insertAdjacentHTML(
+    "afterbegin",
+    `
+      <section class="panel__block desktop-suite" id="desktop-suite">
+        <p class="panel__label">Desktop Lab</p>
+        <div class="desktop-suite__card">
+          <div class="desktop-suite__head">
+            <div>
+              <strong>Desktop Toolkit</strong>
+              <span id="desktop-runtime">${desktopRuntimeLabel(desktopState.meta)}</span>
+            </div>
+            <span class="status-pill desktop-badge" id="desktop-badge">${desktopState.available ? "Desktop" : "Web"}</span>
+          </div>
+          <div class="desktop-suite__actions">
+            <button class="ghost-button" id="desktop-export">Export Save Archive</button>
+            <button class="ghost-button" id="desktop-import">Import Save Archive</button>
+            <button class="ghost-button" id="desktop-open-data">Open Data Folder</button>
+          </div>
+          <p class="desktop-status" id="desktop-status">${desktopState.message}</p>
+        </div>
+      </section>
+    `
+  );
+
   const getById = <T extends HTMLElement>(id: string): T => {
     const element = root.querySelector<T>(`#${id}`);
     if (!element) throw new Error(`Missing #${id}`);
@@ -410,6 +467,13 @@ export function createSnakeExperience(root: HTMLElement): void {
   const careerScoreValue = getById<HTMLElement>("career-score-value");
   const careerFoodsValue = getById<HTMLElement>("career-foods-value");
   const careerComboValue = getById<HTMLElement>("career-combo-value");
+  const desktopSuite = getById<HTMLElement>("desktop-suite");
+  const desktopRuntime = getById<HTMLElement>("desktop-runtime");
+  const desktopBadge = getById<HTMLElement>("desktop-badge");
+  const desktopExport = getById<HTMLButtonElement>("desktop-export");
+  const desktopImport = getById<HTMLButtonElement>("desktop-import");
+  const desktopOpenData = getById<HTMLButtonElement>("desktop-open-data");
+  const desktopStatus = getById<HTMLElement>("desktop-status");
   const seasonList = getById<HTMLDivElement>("season-list");
   const recentList = getById<HTMLDivElement>("recent-list");
   const achievementList = getById<HTMLDivElement>("achievement-list");
@@ -442,6 +506,23 @@ export function createSnakeExperience(root: HTMLElement): void {
       effectsEnabled: preferences.effectsEnabled,
       sfxEnabled: preferences.sfxEnabled
     });
+  };
+
+  const setDesktopMessage = (message: string, tone: DesktopMessageTone = "neutral"): void => {
+    desktopState.message = message;
+    desktopState.tone = tone;
+    desktopStatus.textContent = message;
+    desktopStatus.dataset.tone = tone;
+  };
+
+  const syncDesktopTools = (): void => {
+    const disabled = !desktopState.available || desktopState.busy;
+    desktopSuite.classList.toggle("is-available", desktopState.available);
+    desktopRuntime.textContent = desktopRuntimeLabel(desktopState.meta);
+    desktopBadge.textContent = desktopState.available ? "Desktop" : "Web";
+    desktopExport.disabled = disabled;
+    desktopImport.disabled = disabled;
+    desktopOpenData.disabled = disabled;
   };
 
   const stopReplay = (): void => {
@@ -733,6 +814,8 @@ export function createSnakeExperience(root: HTMLElement): void {
     game.scale.resize(gameRoot.clientWidth || 880, gameRoot.clientHeight || 720);
   });
   resizeObserver.observe(gameRoot);
+  syncDesktopTools();
+  setDesktopMessage(desktopState.message, desktopState.tone);
 
   const toggleFullscreen = async (): Promise<void> => {
     if (document.fullscreenElement) {
@@ -816,6 +899,70 @@ export function createSnakeExperience(root: HTMLElement): void {
     startReplay(engine.getBestReplay(snapshot.level.definition.id), "best");
   });
   resultHighlight.addEventListener("click", () => startReplay(engine.getHighlightReplay(), "highlight"));
+
+  desktopExport.addEventListener("click", async () => {
+    if (!desktopState.available || desktopState.busy) return;
+    desktopState.busy = true;
+    syncDesktopTools();
+    setDesktopMessage("Exporting save archive...", "neutral");
+    try {
+      const result = await exportDesktopSave();
+      if (result.canceled) {
+        setDesktopMessage("Export cancelled.", "neutral");
+      } else {
+        setDesktopMessage(`Save exported to ${result.filePath ?? "selected path"}.`, "success");
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown export error.";
+      setDesktopMessage(`Export failed: ${message}`, "error");
+    } finally {
+      desktopState.busy = false;
+      syncDesktopTools();
+    }
+  });
+
+  desktopImport.addEventListener("click", async () => {
+    if (!desktopState.available || desktopState.busy) return;
+    desktopState.busy = true;
+    syncDesktopTools();
+    setDesktopMessage("Importing save archive...", "neutral");
+    try {
+      const result = await importDesktopSave();
+      if (result.canceled) {
+        setDesktopMessage("Import cancelled.", "neutral");
+      } else {
+        setDesktopMessage("Save imported. Reloading command center...", "success");
+        window.setTimeout(() => window.location.reload(), 600);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown import error.";
+      setDesktopMessage(`Import failed: ${message}`, "error");
+    } finally {
+      desktopState.busy = false;
+      syncDesktopTools();
+    }
+  });
+
+  desktopOpenData.addEventListener("click", async () => {
+    if (!desktopState.available || desktopState.busy) return;
+    desktopState.busy = true;
+    syncDesktopTools();
+    setDesktopMessage("Opening desktop data folder...", "neutral");
+    try {
+      const result = await openDesktopDataDirectory();
+      if (result.ok) {
+        setDesktopMessage(`Data folder opened: ${result.path}`, "success");
+      } else {
+        setDesktopMessage(`Folder open failed: ${result.error ?? "Unknown shell error."}`, "error");
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown folder error.";
+      setDesktopMessage(`Folder open failed: ${message}`, "error");
+    } finally {
+      desktopState.busy = false;
+      syncDesktopTools();
+    }
+  });
 
   root.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
