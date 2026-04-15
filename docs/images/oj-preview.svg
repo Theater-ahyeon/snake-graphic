@@ -1,0 +1,40 @@
+<svg width="1600" height="840" viewBox="0 0 1600 840" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="840" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A1018"/>
+      <stop offset="1" stop-color="#121A26"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="840" rx="34" fill="url(#bg)"/>
+  <rect x="52" y="52" width="1496" height="736" rx="30" fill="#0C1420" stroke="rgba(255,255,255,0.08)"/>
+
+  <rect x="92" y="98" width="692" height="646" rx="24" fill="#0A1320" stroke="rgba(255,255,255,0.07)"/>
+  <text x="124" y="150" fill="#9DB7C7" font-size="16" font-family="Consolas, monospace" letter-spacing="4">OJ VERSION / INTERACTIVE C SUBMISSION</text>
+  <text x="124" y="208" fill="#E8F6FF" font-size="22" font-family="Consolas, monospace">printf("%c\n%d\n", cmd, state.score);</text>
+  <text x="124" y="250" fill="#7AE582" font-size="22" font-family="Consolas, monospace">fflush(stdout);</text>
+  <text x="124" y="320" fill="#BFD6E2" font-size="20" font-family="Consolas, monospace">if (x == 100 &amp;&amp; y == 100) {</text>
+  <text x="152" y="360" fill="#BFD6E2" font-size="20" font-family="Consolas, monospace">render_map(&amp;state, final_map);</text>
+  <text x="152" y="400" fill="#BFD6E2" font-size="20" font-family="Consolas, monospace">printf("%s\n", final_map[r]);</text>
+  <text x="152" y="440" fill="#BFD6E2" font-size="20" font-family="Consolas, monospace">printf("%d\n", state.score);</text>
+  <text x="124" y="480" fill="#BFD6E2" font-size="20" font-family="Consolas, monospace">}</text>
+  <rect x="124" y="544" width="628" height="150" rx="22" fill="#111C2B" stroke="rgba(255,255,255,0.05)"/>
+  <text x="156" y="590" fill="#FFD166" font-size="18" font-family="Segoe UI, Arial, sans-serif">What this version includes</text>
+  <text x="156" y="628" fill="#E8F6FF" font-size="18" font-family="Segoe UI, Arial, sans-serif">• Interactive I/O protocol aligned with the assignment</text>
+  <text x="156" y="658" fill="#E8F6FF" font-size="18" font-family="Segoe UI, Arial, sans-serif">• Growth by food and fixed-step expansion rule</text>
+  <text x="156" y="688" fill="#E8F6FF" font-size="18" font-family="Segoe UI, Arial, sans-serif">• Collision rollback output before the fatal move</text>
+
+  <rect x="832" y="98" width="676" height="646" rx="24" fill="#0B1521" stroke="rgba(255,255,255,0.07)"/>
+  <text x="866" y="150" fill="#9DB7C7" font-size="16" font-family="Segoe UI, Arial, sans-serif" letter-spacing="4">COURSE REPOSITORY STRUCTURE</text>
+  <rect x="866" y="192" width="608" height="248" rx="22" fill="#101C2A" stroke="rgba(255,255,255,0.05)"/>
+  <text x="900" y="240" fill="#E8F6FF" font-size="22" font-family="Consolas, monospace">snake-graphic/</text>
+  <text x="930" y="286" fill="#CFE0EA" font-size="20" font-family="Consolas, monospace">src/                # graphical version</text>
+  <text x="930" y="324" fill="#CFE0EA" font-size="20" font-family="Consolas, monospace">oj/</text>
+  <text x="970" y="362" fill="#CFE0EA" font-size="20" font-family="Consolas, monospace">main.c             # recommended OJ submission</text>
+  <text x="970" y="400" fill="#CFE0EA" font-size="20" font-family="Consolas, monospace">main.cpp           # C++ reference version</text>
+
+  <rect x="866" y="484" width="608" height="178" rx="22" fill="#101C2A" stroke="rgba(255,255,255,0.05)"/>
+  <text x="900" y="532" fill="#00F5D4" font-size="22" font-family="Segoe UI, Arial, sans-serif">Dual-delivery ready</text>
+  <text x="900" y="576" fill="#E8F6FF" font-size="19" font-family="Segoe UI, Arial, sans-serif">One repository now contains both:</text>
+  <text x="900" y="610" fill="#E8F6FF" font-size="19" font-family="Segoe UI, Arial, sans-serif">• the polished graphical project for demo and presentation</text>
+  <text x="900" y="644" fill="#E8F6FF" font-size="19" font-family="Segoe UI, Arial, sans-serif">• the interactive OJ submission version for the assignment</text>
+</svg>

@@ -9,6 +9,14 @@ import { SnakeEngine } from "../game/simulation/engine";
 import type { SnakeSnapshot } from "../game/simulation/types";
 import { GameScene, type ScenePreferences } from "../phaser/scenes/GameScene";
 
+const SETTINGS_KEY = "neon-snake-ui-settings";
+
+interface StoredSettings {
+  mode: GameModeId;
+  effectsEnabled: boolean;
+  sfxEnabled: boolean;
+}
+
 function formatTime(elapsedMs: number): string {
   const totalSeconds = Math.floor(elapsedMs / 1000);
   const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
@@ -22,16 +30,66 @@ function missionStatus(snapshot: SnakeSnapshot): Array<{ label: string; done: bo
       label: `得分达到 ${snapshot.mode.targetScore}`,
       done: snapshot.score >= snapshot.mode.targetScore
     },
-    { label: "连续吃到 8 颗能量果", done: snapshot.foodsEaten >= 8 },
-    { label: "连击达到 3 次", done: snapshot.maxCombo >= 3 }
+    { label: "累计吃到 8 颗能量果", done: snapshot.foodsEaten >= 8 },
+    { label: "最长连击达到 3 次", done: snapshot.maxCombo >= 3 }
   ];
 }
 
+function readStoredSettings(): StoredSettings {
+  try {
+    const raw = window.localStorage.getItem(SETTINGS_KEY);
+    if (!raw) {
+      return {
+        mode: DEFAULT_MODE,
+        effectsEnabled: true,
+        sfxEnabled: true
+      };
+    }
+    const parsed = JSON.parse(raw) as Partial<StoredSettings>;
+    return {
+      mode:
+        parsed.mode === "zen" || parsed.mode === "arcade" || parsed.mode === "inferno"
+          ? parsed.mode
+          : DEFAULT_MODE,
+      effectsEnabled: parsed.effectsEnabled ?? true,
+      sfxEnabled: parsed.sfxEnabled ?? true
+    };
+  } catch {
+    return {
+      mode: DEFAULT_MODE,
+      effectsEnabled: true,
+      sfxEnabled: true
+    };
+  }
+}
+
+function writeStoredSettings(settings: StoredSettings): void {
+  window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+function directionLabel(direction: Direction): string {
+  if (direction === "up") return "UP";
+  if (direction === "down") return "DOWN";
+  if (direction === "left") return "LEFT";
+  return "RIGHT";
+}
+
 export function createSnakeExperience(root: HTMLElement): void {
+  const params = new URLSearchParams(window.location.search);
+  const storedSettings = readStoredSettings();
+  const initialMode = (() => {
+    const requested = params.get("mode");
+    if (requested === "zen" || requested === "arcade" || requested === "inferno") {
+      return requested;
+    }
+    return storedSettings.mode;
+  })();
+  const shouldAutoStart = params.get("autostart") === "1";
+
   const engine = new SnakeEngine();
   const preferences: ScenePreferences = {
-    effectsEnabled: true,
-    sfxEnabled: true
+    effectsEnabled: storedSettings.effectsEnabled,
+    sfxEnabled: storedSettings.sfxEnabled
   };
 
   root.innerHTML = `
@@ -49,6 +107,7 @@ export function createSnakeExperience(root: HTMLElement): void {
           </div>
         </div>
         <div class="topbar__actions">
+          <button class="ghost-button" data-action="toggle-fullscreen">全屏展示</button>
           <button class="ghost-button" data-action="toggle-pause">暂停 / 继续</button>
           <button class="ghost-button" data-action="restart">重新开始</button>
         </div>
@@ -57,13 +116,13 @@ export function createSnakeExperience(root: HTMLElement): void {
       <main class="layout">
         <section class="panel briefing">
           <div class="panel__label">Visual Direction</div>
-          <h2 class="briefing__title">一个适合答辩展示的高质感图形化贪吃蛇项目</h2>
+          <h2 class="briefing__title">一个适合课程答辩与展示录屏的高质感贪吃蛇项目</h2>
           <p class="briefing__text">
-            这个版本强调完整度、节奏感和视觉表现：保留经典规则，同时加入模式切换、分层 HUD、响应式布局、
-            细腻粒子反馈和本地最高分记录。
+            这个版本强调完整度、节奏感和视觉呈现：保留课程核心规则，同时加入模式切换、分层 HUD、
+            响应式布局、粒子反馈和本地最佳成绩记录。
           </p>
 
-          <div class="mode-grid" id="mode-grid">
+          <div class="mode-grid">
             ${Object.values(GAME_MODES)
               .map(
                 (mode) => `
@@ -91,16 +150,17 @@ export function createSnakeExperience(root: HTMLElement): void {
               <ul class="controls-list">
                 <li>方向键 / WASD：控制蛇移动</li>
                 <li>空格 / P：暂停或继续</li>
-                <li>触屏设备：使用下方方向盘</li>
+                <li>F：切换浏览器全屏</li>
+                <li>移动端：支持按钮点击和滑动控制</li>
               </ul>
             </div>
             <div class="toggle-group">
               <label class="toggle">
-                <input type="checkbox" id="toggle-effects" checked />
+                <input type="checkbox" id="toggle-effects" />
                 <span>粒子与镜头动效</span>
               </label>
               <label class="toggle">
-                <input type="checkbox" id="toggle-sfx" checked />
+                <input type="checkbox" id="toggle-sfx" />
                 <span>极简电子音效</span>
               </label>
             </div>
@@ -109,7 +169,7 @@ export function createSnakeExperience(root: HTMLElement): void {
           <div class="briefing__footer">
             <button class="primary-button" id="start-button">开始本局</button>
             <p class="briefing__caption">
-              目标：完成单人游戏、实时记分、精致界面与稳定操作逻辑。
+              目标：完成单人玩法、实时记分、图形化展示和适合答辩演示的完整交互体验。
             </p>
           </div>
         </section>
@@ -127,10 +187,10 @@ export function createSnakeExperience(root: HTMLElement): void {
             <div class="arena__overlay" id="arena-overlay">
               <div class="arena__overlay-card">
                 <p class="panel__label">Mission Brief</p>
-                <h3>让蛇在霓虹方格中持续生长</h3>
+                <h3>让蛇在霓虹方格里持续生长</h3>
                 <p>
                   障碍物固定出现，边界不可穿越。每吃到一枚能量果加 10 分，
-                  同时保留课程作业要求中的“按固定步数被动增长”机制。
+                  同时保留课程作业中的固定步数被动增长机制。
                 </p>
               </div>
             </div>
@@ -147,7 +207,7 @@ export function createSnakeExperience(root: HTMLElement): void {
             </div>
           </div>
           <div class="arena__footer">
-            <span>边框、障碍与被动增长机制均对齐课程要求</span>
+            <span>边框、障碍与被动增长机制均与课程要求保持一致</span>
             <span id="seed-value">Seed #000000</span>
           </div>
         </section>
@@ -183,27 +243,25 @@ export function createSnakeExperience(root: HTMLElement): void {
           <section class="panel telemetry__card telemetry__note">
             <p class="panel__label">Design Notes</p>
             <p>
-              游戏画面采用发光网格、分层玻璃态 HUD 与程序化粒子效果，
-              适合直接拿去课堂展示、录屏或继续扩展为完整小组项目。
+              游戏画面采用发光网格、分层玻璃态 HUD 和程序化粒子效果，适合直接作为课程展示项目，
+              也便于继续扩展为更完整的小组版本。
             </p>
           </section>
         </aside>
       </main>
 
       <div class="touch-controls">
-        <button class="touch-button touch-button--up" data-dir="up">▲</button>
-        <button class="touch-button touch-button--left" data-dir="left">◀</button>
-        <button class="touch-button touch-button--down" data-dir="down">▼</button>
-        <button class="touch-button touch-button--right" data-dir="right">▶</button>
+        <button class="touch-button touch-button--up" data-dir="up" aria-label="up">▲</button>
+        <button class="touch-button touch-button--left" data-dir="left" aria-label="left">◀</button>
+        <button class="touch-button touch-button--down" data-dir="down" aria-label="down">▼</button>
+        <button class="touch-button touch-button--right" data-dir="right" aria-label="right">▶</button>
       </div>
     </div>
   `;
 
   const getById = <T extends HTMLElement>(id: string): T => {
     const element = root.querySelector<T>(`#${id}`);
-    if (!element) {
-      throw new Error(`Missing element #${id}`);
-    }
+    if (!element) throw new Error(`Missing element #${id}`);
     return element;
   };
 
@@ -232,6 +290,17 @@ export function createSnakeExperience(root: HTMLElement): void {
   const gameRoot = getById<HTMLElement>("game-root");
   const effectsToggle = getById<HTMLInputElement>("toggle-effects");
   const sfxToggle = getById<HTMLInputElement>("toggle-sfx");
+
+  effectsToggle.checked = preferences.effectsEnabled;
+  sfxToggle.checked = preferences.sfxEnabled;
+
+  const persistSettings = (mode: GameModeId): void => {
+    writeStoredSettings({
+      mode,
+      effectsEnabled: preferences.effectsEnabled,
+      sfxEnabled: preferences.sfxEnabled
+    });
+  };
 
   const game = new Phaser.Game({
     type: Phaser.AUTO,
@@ -268,7 +337,7 @@ export function createSnakeExperience(root: HTMLElement): void {
     timeValue.textContent = formatTime(snapshot.elapsedMs);
     speedValue.textContent = `${snapshot.tickMs} ms`;
     growValue.textContent = String(snapshot.passiveGrowIn);
-    directionValue.textContent = snapshot.direction.toUpperCase();
+    directionValue.textContent = directionLabel(snapshot.direction);
     seedValue.textContent = `Seed #${String(snapshot.runSeed).padStart(6, "0")}`;
 
     missionList.innerHTML = missionStatus(snapshot)
@@ -301,7 +370,7 @@ export function createSnakeExperience(root: HTMLElement): void {
       statusPill.textContent = "本局结束";
       startButton.textContent = "再次挑战";
       resultCard.classList.remove("is-hidden");
-      resultTitle.textContent = "Run Complete";
+      resultTitle.textContent = "本局结束";
       resultSubtitle.textContent = snapshot.lastCrashReason ?? "本局已结束";
       resultScore.textContent = String(snapshot.score);
       resultFoods.textContent = String(snapshot.foodsEaten);
@@ -309,11 +378,20 @@ export function createSnakeExperience(root: HTMLElement): void {
     }
   };
 
+  const toggleFullscreen = async (): Promise<void> => {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+      return;
+    }
+    await root.requestFullscreen();
+  };
+
   root.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((button) => {
     button.addEventListener("click", () => {
       const mode = button.dataset.mode as GameModeId;
       engine.setMode(mode);
       updateModeUi(mode);
+      persistSettings(mode);
     });
   });
 
@@ -327,6 +405,12 @@ export function createSnakeExperience(root: HTMLElement): void {
     button.addEventListener("click", () => engine.togglePause());
   });
 
+  root.querySelectorAll<HTMLButtonElement>("[data-action='toggle-fullscreen']").forEach((button) => {
+    button.addEventListener("click", () => {
+      void toggleFullscreen();
+    });
+  });
+
   root.querySelectorAll<HTMLButtonElement>("[data-action='restart']").forEach((button) => {
     button.addEventListener("click", () => engine.startNewRun());
   });
@@ -336,10 +420,49 @@ export function createSnakeExperience(root: HTMLElement): void {
 
   effectsToggle.addEventListener("change", () => {
     preferences.effectsEnabled = effectsToggle.checked;
+    persistSettings(engine.getSnapshot().mode.id);
   });
 
   sfxToggle.addEventListener("change", () => {
     preferences.sfxEnabled = sfxToggle.checked;
+    persistSettings(engine.getSnapshot().mode.id);
+  });
+
+  const handleSwipe = (): void => {
+    let startX = 0;
+    let startY = 0;
+
+    gameRoot.addEventListener(
+      "pointerdown",
+      (event) => {
+        startX = event.clientX;
+        startY = event.clientY;
+      },
+      { passive: true }
+    );
+
+    gameRoot.addEventListener(
+      "pointerup",
+      (event) => {
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+        if (Math.abs(dx) < 24 && Math.abs(dy) < 24) return;
+        if (Math.abs(dx) > Math.abs(dy)) {
+          engine.queueDirection(dx > 0 ? "right" : "left");
+        } else {
+          engine.queueDirection(dy > 0 ? "down" : "up");
+        }
+      },
+      { passive: true }
+    );
+  };
+
+  handleSwipe();
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key.toLowerCase() === "f") {
+      void toggleFullscreen();
+    }
   });
 
   engine.subscribe((snapshot) => {
@@ -347,8 +470,11 @@ export function createSnakeExperience(root: HTMLElement): void {
     updateSnapshotUi(snapshot);
   });
 
-  updateModeUi(DEFAULT_MODE);
-  engine.setMode(DEFAULT_MODE);
+  updateModeUi(initialMode);
+  engine.setMode(initialMode);
+  if (shouldAutoStart) {
+    queueMicrotask(() => engine.startNewRun());
+  }
 
   const resizeObserver = new ResizeObserver(() => {
     game.scale.resize(gameRoot.clientWidth || 780, gameRoot.clientHeight || 780);

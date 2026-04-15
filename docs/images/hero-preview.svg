@@ -1,0 +1,74 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="180" y1="0" x2="1360" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#07111B"/>
+      <stop offset="0.55" stop-color="#091827"/>
+      <stop offset="1" stop-color="#0A1320"/>
+    </linearGradient>
+    <linearGradient id="snake" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#00F5D4"/>
+      <stop offset="1" stop-color="#1FEF9F"/>
+    </linearGradient>
+    <filter id="blurA">
+      <feGaussianBlur stdDeviation="60"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="900" rx="36" fill="url(#bg)"/>
+  <circle cx="180" cy="150" r="170" fill="#00F5D4" fill-opacity="0.16" filter="url(#blurA)"/>
+  <circle cx="1380" cy="740" r="190" fill="#FF4D6D" fill-opacity="0.14" filter="url(#blurA)"/>
+  <circle cx="1280" cy="160" r="140" fill="#FFB703" fill-opacity="0.12" filter="url(#blurA)"/>
+  <rect x="52" y="52" width="1496" height="796" rx="34" fill="#07101A" fill-opacity="0.88" stroke="rgba(255,255,255,0.08)"/>
+
+  <rect x="96" y="98" width="392" height="704" rx="28" fill="#0B1625" fill-opacity="0.92" stroke="rgba(255,255,255,0.07)"/>
+  <text x="128" y="148" fill="#95B5C8" font-size="16" font-family="Segoe UI, Arial, sans-serif" letter-spacing="4">COURSE PROJECT EDITION</text>
+  <text x="128" y="228" fill="#F5FBFF" font-size="54" font-weight="800" font-family="Segoe UI, Arial, sans-serif">Neon Snake Studio</text>
+  <text x="128" y="292" fill="#D2E6F2" font-size="24" font-family="Segoe UI, Arial, sans-serif">A polished snake game for coursework showcase,</text>
+  <text x="128" y="326" fill="#D2E6F2" font-size="24" font-family="Segoe UI, Arial, sans-serif">live demo, and continued team expansion.</text>
+  <rect x="128" y="374" width="328" height="122" rx="22" fill="#102133" stroke="rgba(255,255,255,0.06)"/>
+  <text x="156" y="416" fill="#FFCB6B" font-size="20" font-weight="700" font-family="Segoe UI, Arial, sans-serif">Arcade Pulse</text>
+  <text x="156" y="452" fill="#D6E7F0" font-size="18" font-family="Segoe UI, Arial, sans-serif">Balanced rhythm, strong presentation,</text>
+  <text x="156" y="480" fill="#D6E7F0" font-size="18" font-family="Segoe UI, Arial, sans-serif">ideal for defense and screen recording.</text>
+  <rect x="128" y="532" width="328" height="160" rx="22" fill="#0F2032" stroke="rgba(255,255,255,0.06)"/>
+  <text x="156" y="574" fill="#95B5C8" font-size="16" font-family="Segoe UI, Arial, sans-serif" letter-spacing="3">FEATURES</text>
+  <text x="156" y="616" fill="#E8F6FF" font-size="20" font-family="Segoe UI, Arial, sans-serif">• Phaser + TypeScript + Vite</text>
+  <text x="156" y="648" fill="#E8F6FF" font-size="20" font-family="Segoe UI, Arial, sans-serif">• Three gameplay modes</text>
+  <text x="156" y="680" fill="#E8F6FF" font-size="20" font-family="Segoe UI, Arial, sans-serif">• Local best score and mission tracker</text>
+
+  <rect x="530" y="98" width="640" height="704" rx="30" fill="#0A1726" fill-opacity="0.95" stroke="rgba(255,255,255,0.08)"/>
+  <rect x="584" y="148" width="532" height="596" rx="28" fill="#08131F" stroke="rgba(184,255,241,0.14)"/>
+  <g opacity="0.52" stroke="#B8FFF1" stroke-opacity="0.08">
+    <path d="M610 178H1092"/><path d="M610 208H1092"/><path d="M610 238H1092"/><path d="M610 268H1092"/>
+    <path d="M610 298H1092"/><path d="M610 328H1092"/><path d="M610 358H1092"/><path d="M610 388H1092"/>
+    <path d="M610 418H1092"/><path d="M610 448H1092"/><path d="M610 478H1092"/><path d="M610 508H1092"/>
+    <path d="M610 538H1092"/><path d="M610 568H1092"/><path d="M610 598H1092"/><path d="M610 628H1092"/>
+    <path d="M610 658H1092"/><path d="M610 688H1092"/>
+    <path d="M610 178V714"/><path d="M640 178V714"/><path d="M670 178V714"/><path d="M700 178V714"/>
+    <path d="M730 178V714"/><path d="M760 178V714"/><path d="M790 178V714"/><path d="M820 178V714"/>
+    <path d="M850 178V714"/><path d="M880 178V714"/><path d="M910 178V714"/><path d="M940 178V714"/>
+    <path d="M970 178V714"/><path d="M1000 178V714"/><path d="M1030 178V714"/><path d="M1060 178V714"/><path d="M1090 178V714"/>
+  </g>
+  <rect x="646" y="404" width="28" height="28" rx="10" fill="url(#snake)"/>
+  <rect x="676" y="404" width="28" height="28" rx="10" fill="url(#snake)"/>
+  <rect x="706" y="404" width="28" height="28" rx="10" fill="url(#snake)"/>
+  <rect x="736" y="404" width="28" height="28" rx="10" fill="url(#snake)"/>
+  <rect x="766" y="404" width="28" height="28" rx="10" fill="url(#snake)"/>
+  <rect x="796" y="404" width="28" height="28" rx="12" fill="#00F5D4"/>
+  <circle cx="812" cy="418" r="3.6" fill="#04121D"/>
+  <circle cx="823" cy="418" r="3.6" fill="#04121D"/>
+  <circle cx="914" cy="358" r="14" fill="#FFD166"/>
+  <circle cx="914" cy="358" r="28" fill="#FFD166" fill-opacity="0.12"/>
+  <rect x="946" y="508" width="28" height="28" rx="10" fill="#51657E"/>
+  <rect x="976" y="538" width="28" height="28" rx="10" fill="#51657E"/>
+  <rect x="1006" y="568" width="28" height="28" rx="10" fill="#51657E"/>
+
+  <rect x="1198" y="98" width="306" height="704" rx="28" fill="#0B1625" fill-opacity="0.92" stroke="rgba(255,255,255,0.07)"/>
+  <text x="1232" y="148" fill="#95B5C8" font-size="16" font-family="Segoe UI, Arial, sans-serif" letter-spacing="4">SCOREBOARD</text>
+  <text x="1232" y="220" fill="#F7FBFF" font-size="18" font-family="Segoe UI, Arial, sans-serif">Current Score</text>
+  <text x="1232" y="278" fill="#FFCB6B" font-size="56" font-weight="800" font-family="Segoe UI, Arial, sans-serif">160</text>
+  <text x="1232" y="356" fill="#F7FBFF" font-size="18" font-family="Segoe UI, Arial, sans-serif">Longest Combo</text>
+  <text x="1232" y="412" fill="#00F5D4" font-size="48" font-weight="800" font-family="Segoe UI, Arial, sans-serif">4x</text>
+  <text x="1232" y="500" fill="#95B5C8" font-size="16" font-family="Segoe UI, Arial, sans-serif" letter-spacing="4">MISSION TRACKER</text>
+  <text x="1232" y="556" fill="#E7F7FF" font-size="20" font-family="Segoe UI, Arial, sans-serif">• Reach 220 points</text>
+  <text x="1232" y="590" fill="#E7F7FF" font-size="20" font-family="Segoe UI, Arial, sans-serif">• Eat 8 energy fruits</text>
+  <text x="1232" y="624" fill="#E7F7FF" font-size="20" font-family="Segoe UI, Arial, sans-serif">• Hit 3 combo streak</text>
+</svg>
