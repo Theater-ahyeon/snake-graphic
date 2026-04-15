@@ -482,7 +482,7 @@ export function createSnakeExperience(root: HTMLElement): void {
 
   const scene = new GameScene(engine, () => preferences);
   const game = new Phaser.Game({
-    type: Phaser.AUTO,
+    type: desktopState.available ? Phaser.CANVAS : Phaser.AUTO,
     parent: gameRoot,
     width: gameRoot.clientWidth || 880,
     height: gameRoot.clientHeight || 720,
