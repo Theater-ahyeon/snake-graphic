@@ -5,7 +5,7 @@ export const OBSTACLE_COUNT = 10;
 export const SCORE_PER_FOOD = 10;
 
 export type Direction = "up" | "down" | "left" | "right";
-export type GameStatus = "idle" | "playing" | "paused" | "gameover";
+export type GameStatus = "idle" | "playing" | "paused" | "gameover" | "victory";
 export type GameModeId = "zen" | "arcade" | "inferno";
 
 export interface GameMode {
