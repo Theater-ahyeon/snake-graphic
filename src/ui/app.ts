@@ -480,6 +480,11 @@ export function createSnakeExperience(root: HTMLElement): void {
   const effectsToggle = getById<HTMLInputElement>("toggle-effects");
   const sfxToggle = getById<HTMLInputElement>("toggle-sfx");
 
+  const arenaWasInitiallyHidden = arenaShell.classList.contains("is-hidden");
+  if (arenaWasInitiallyHidden) {
+    arenaShell.classList.remove("is-hidden");
+  }
+
   const scene = new GameScene(engine, () => preferences);
   const game = new Phaser.Game({
     type: desktopState.available ? Phaser.CANVAS : Phaser.AUTO,
@@ -495,6 +500,10 @@ export function createSnakeExperience(root: HTMLElement): void {
     },
     scene: [scene]
   });
+
+  if (arenaWasInitiallyHidden) {
+    arenaShell.classList.add("is-hidden");
+  }
 
   effectsToggle.checked = preferences.effectsEnabled;
   sfxToggle.checked = preferences.sfxEnabled;
